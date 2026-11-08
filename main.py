@@ -1,17 +1,35 @@
-energy = int(0)
+import time
+from database import init_db
+energy = 0
 click_quantity = int(1)
 upgrade_price = int(10)
-upgrade_quantify = int(1)
+all_clicks = int(0)
+upgrade_quantity = int(0)
+generators_quantity = 0
+factory_price = 100
+factory_energy_quantity = 0
+energy_given = 0
 
+init_db()
+
+start = time.time()
+print(start)
+last_time = time.time()
 def show_statistics():
-    print(f"===IDLE CLICKER===\nEnergia: {energy}\nIlość za kliknięcie: {click_quantity}\n1.Kliknij (+{click_quantity} energii)\n2.Kup ulepszenie - +1 więcej energii co klik (Cena: {upgrade_price})\n3.Sprawdź statsytyki.\n4.Wyjdź z gry.")
+    print(f"===IDLE CLICKER===\nEnergia: {energy}\nIlość za kliknięcie: {click_quantity}\nWszystkie kliknięcia: {all_clicks}\nKupione ulepszenia: {upgrade_quantity}\nGeneratory: {generators_quantity}\nProdukcja: {factory_energy_quantity} energii/s\n1.Kliknij (+{click_quantity} energii)\n2.Kup ulepszenie - +1 więcej energii co klik (Cena: {upgrade_price})\n3.Kup generator energii (Cena: {factory_price})\n4.Odbierz energię z generatorów (do odebrania: {int(energy_given)})\n5.Sprawdź statsytyki.\n6.Wyjdź z gry.")
 
 show_statistics()
 
 while True:
     answer = str(input(""))
+    if factory_energy_quantity > 0:
+        current_time = time.time()
+        seconds_passed = current_time - last_time
+        energy_given += seconds_passed * factory_energy_quantity
+        last_time = current_time
     if answer == '1':
         energy += click_quantity
+        all_clicks += 1
         print(f"Dodana energia: {click_quantity}, Balans: {energy}")
     elif answer == '2':
         if energy < upgrade_price:
@@ -19,10 +37,29 @@ while True:
         else:
             energy -= upgrade_price
             click_quantity += 1
-            print(f"Zakupiłeś ulepszenie! Teraz dostajesz {click_quantity} energii za kliknięcie!\nEnergia: {energy}")
+            upgrade_price = int(upgrade_price * 1.5)
+            upgrade_quantity += 1
+            print(f"Zakupiłeś ulepszenie! Teraz dostajesz {click_quantity} energii za kliknięcie!\nEnergia: {energy}\nNastępna cena ulepszenia: {upgrade_price}")
     elif answer == '3':
-        show_statistics()
+        if energy < factory_price:
+            print(f"Przykro mi :( Nie możesz zakupić generatora. Masz tylko {energy} energii..\nCena fabryki: {factory_price}")
+        else:
+            factory_energy_quantity += 1
+            generators_quantity += 1
+            energy -= factory_price
+            factory_price = factory_price * 2
+            if generators_quantity == 1:
+                last_time = time.time()
+            print(f"Świetnie! Zakupiłeś generator! Od teraz będzie ci generował {factory_energy_quantity} energii na sekundę!\nNastępny generator kosztuję: {factory_price} energii.")
     elif answer == '4':
+        collected_energy = int(energy_given)
+        print(f"Pomyślnie odebrałeś {energy_given} energii.")
+        energy += collected_energy
+        energy_given -= collected_energy
+        print(f"Balans energii po zakupie: {energy}")
+    elif answer == '5':
+        show_statistics()
+    elif answer == '6':
         print("Szkoda, że już kończysz grę :(")
         break
     
