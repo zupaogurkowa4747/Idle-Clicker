@@ -15,6 +15,17 @@ init_db()
 start = time.time()
 print(start)
 last_time = time.time()
+
+def click():
+    global energy, all_clicks
+    
+    energy += click_quantity
+    all_clicks += 1
+    print(f"Dodana energia: {click_quantity}, Balans: {energy}")
+
+def stop():
+    print("Szkoda, że już kończysz grę :(")
+
 def show_statistics():
     print(f"===IDLE CLICKER===\nEnergia: {energy}\nIlość za kliknięcie: {click_quantity}\nWszystkie kliknięcia: {all_clicks}\nKupione ulepszenia: {upgrade_quantity}\nGeneratory: {generators_quantity}\nProdukcja: {factory_energy_quantity} energii/s\n1.Kliknij (+{click_quantity} energii)\n2.Kup ulepszenie - +1 więcej energii co klik (Cena: {upgrade_price})\n3.Kup generator energii (Cena: {factory_price})\n4.Odbierz energię z generatorów (do odebrania: {int(energy_given)})\n5.Sprawdź statsytyki.\n6.Wyjdź z gry.")
 
@@ -28,9 +39,7 @@ while True:
         energy_given += seconds_passed * factory_energy_quantity
         last_time = current_time
     if answer == '1':
-        energy += click_quantity
-        all_clicks += 1
-        print(f"Dodana energia: {click_quantity}, Balans: {energy}")
+        click()
     elif answer == '2':
         if energy < upgrade_price:
             print(f"Nie możesz tego kupić, masz za mało energii\nEnergia: {energy}, Cena ulepszenia: {upgrade_price}")
@@ -53,14 +62,14 @@ while True:
             print(f"Świetnie! Zakupiłeś generator! Od teraz będzie ci generował {factory_energy_quantity} energii na sekundę!\nNastępny generator kosztuję: {factory_price} energii.")
     elif answer == '4':
         collected_energy = int(energy_given)
-        print(f"Pomyślnie odebrałeś {energy_given} energii.")
+        print(f"Pomyślnie odebrałeś {collected_energy} energii.")
         energy += collected_energy
         energy_given -= collected_energy
         print(f"Balans energii po zakupie: {energy}")
     elif answer == '5':
         show_statistics()
     elif answer == '6':
-        print("Szkoda, że już kończysz grę :(")
+        stop()
         break
     
 
