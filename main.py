@@ -1,22 +1,30 @@
 import time
-from database import init_db
-energy = 0
-click_quantity = int(1)
-upgrade_price = int(10)
-all_clicks = int(0)
-upgrade_quantity = int(0)
-generators_quantity = 0
-factory_price = 100
-factory_energy_quantity = 0
-energy_given = 0
+from database import init_db, load_player, save_player, create_player
 
 init_db()
+player = load_player(1)
+
+if player is None:
+    create_player(0)
+    player = load_player(1)
+
+energy = player["energy"]
+click_quantity = player["click_quantity"]
+upgrade_price = player["upgrade_price"]
+all_clicks = player["all_clicks"]
+upgrade_quantity = player["upgrade_quantity"]
+generators_quantity = player["generators_quantity"]
+factory_price = player["factory_price"]
+factory_energy_quantity = generators_quantity
+energy_given = 0
 
 start = time.time()
 print(start)
 last_time = time.time()
 
-def click():
+last_save = time.time()
+    
+def click(): 
     global energy, all_clicks
     
     energy += click_quantity
@@ -69,8 +77,13 @@ while True:
     elif answer == '5':
         show_statistics()
     elif answer == '6':
+        save_player(1, energy, click_quantity, all_clicks, upgrade_quantity, upgrade_price, generators_quantity, factory_price)
         stop()
         break
+
+    if time.time() - last_save >= 30:
+        save_player(1, energy, click_quantity, all_clicks, upgrade_quantity, upgrade_price, generators_quantity, factory_price)
+        last_save = time.time()
     
 
     
